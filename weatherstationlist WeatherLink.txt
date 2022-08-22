@@ -1,0 +1,3 @@
+//See hardwarelist.txt for details on this file format.
+//Version|Manufacturer|Model|Comment|MapsTo|PlugInDllName
+2|Davis Instruments|WeatherLink live|WeatherLink live Weather Station plugin| |libWeatherLink||1|1|1|
