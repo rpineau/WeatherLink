@@ -51,12 +51,10 @@ Source: "weatherstationlist WeatherLink.txt";                   DestDir: "{app}\
 ; 32 bit
 Source: "libWeatherLink\Win32\Release\libWeatherLink.dll";      DestDir: "{app}\Plugins\WeatherStationPlugIns"; Flags: ignoreversion
 Source: "WeatherLink.ui";                                       DestDir: "{app}\Plugins\WeatherStationPlugIns"; Flags: ignoreversion
-Source: "win_libs/Win32/libcurl.dll";               DestDir: "{app}\..\..\"; Flags: ignoreversion
 
 ; 64 bit
 Source: "libWeatherLink\x64\Release\libWeatherLink.dll";        DestDir: "{app}\Plugins64\WeatherStationPlugIns"; Flags: ignoreversion; Check: DirExists(ExpandConstant('{app}\Plugins64\WeatherStationPlugIns'))
 Source: "WeatherLink.ui";                                       DestDir: "{app}\Plugins64\WeatherStationPlugIns"; Flags: ignoreversion; Check: DirExists(ExpandConstant('{app}\Plugins64\WeatherStationPlugIns'))
-Source: "win_libs/x64/libcurl.dll";                 DestDir: "{app}\..\..\TheSky64"; Flags: ignoreversion; Check: DirExists(ExpandConstant('{app}\..\..\TheSky64'))
 
 [Code]
 {* Below is a function to read TheSkyXInstallPath.txt and confirm that the directory does exist
