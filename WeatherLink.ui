@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>540</height>
+    <width>364</width>
+    <height>436</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>496</width>
-    <height>540</height>
+    <width>364</width>
+    <height>436</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>496</width>
-    <height>540</height>
+    <width>364</width>
+    <height>436</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -92,8 +92,8 @@
      <widget class="QPushButton" name="pushButtonCancel">
       <property name="geometry">
        <rect>
-        <x>264</x>
-        <y>472</y>
+        <x>152</x>
+        <y>360</y>
         <width>81</width>
         <height>24</height>
        </rect>
@@ -108,8 +108,8 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>472</y>
+        <x>248</x>
+        <y>360</y>
         <width>81</width>
         <height>24</height>
        </rect>
@@ -126,40 +126,24 @@
        <rect>
         <x>16</x>
         <y>136</y>
-        <width>353</width>
-        <height>185</height>
+        <width>305</width>
+        <height>201</height>
        </rect>
       </property>
       <property name="title">
        <string>Status</string>
       </property>
-      <widget class="QLabel" name="label_12">
-       <property name="geometry">
-        <rect>
-         <x>16</x>
-         <y>32</y>
-         <width>80</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Voltage :</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_15">
        <property name="geometry">
         <rect>
-         <x>16</x>
-         <y>56</y>
-         <width>80</width>
+         <x>48</x>
+         <y>32</y>
+         <width>144</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>Temp :</string>
+        <string>Ambian Temperature :</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -168,8 +152,8 @@
       <widget class="QLabel" name="label_16">
        <property name="geometry">
         <rect>
-         <x>8</x>
-         <y>80</y>
+         <x>104</x>
+         <y>56</y>
          <width>88</width>
          <height>16</height>
         </rect>
@@ -184,8 +168,8 @@
       <widget class="QLabel" name="label_17">
        <property name="geometry">
         <rect>
-         <x>8</x>
-         <y>104</y>
+         <x>104</x>
+         <y>80</y>
          <width>88</width>
          <height>16</height>
         </rect>
@@ -197,28 +181,12 @@
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="voltage">
-       <property name="geometry">
-        <rect>
-         <x>104</x>
-         <y>32</y>
-         <width>56</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>-.- V</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
       <widget class="QLabel" name="temperature">
        <property name="geometry">
         <rect>
-         <x>104</x>
-         <y>56</y>
-         <width>56</width>
+         <x>208</x>
+         <y>32</y>
+         <width>64</width>
          <height>16</height>
         </rect>
        </property>
@@ -226,31 +194,31 @@
         <string>-.- ºC</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="humidity">
        <property name="geometry">
         <rect>
-         <x>104</x>
-         <y>80</y>
-         <width>56</width>
+         <x>208</x>
+         <y>56</y>
+         <width>64</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>- %</string>
+        <string>-- %</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="dewPoint">
        <property name="geometry">
         <rect>
-         <x>104</x>
-         <y>104</y>
-         <width>56</width>
+         <x>208</x>
+         <y>80</y>
+         <width>64</width>
          <height>16</height>
         </rect>
        </property>
@@ -258,39 +226,103 @@
         <string>-.- ºC</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
       <widget class="QLabel" name="label_23">
        <property name="geometry">
         <rect>
-         <x>0</x>
-         <y>128</y>
-         <width>96</width>
+         <x>48</x>
+         <y>104</y>
+         <width>144</width>
          <height>24</height>
         </rect>
        </property>
        <property name="text">
-        <string>Current draw :</string>
+        <string>Barometric Pressure :</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
        </property>
       </widget>
-      <widget class="QLabel" name="currentDraw">
+      <widget class="QLabel" name="pressure">
        <property name="geometry">
         <rect>
-         <x>112</x>
-         <y>128</y>
-         <width>56</width>
+         <x>208</x>
+         <y>104</y>
+         <width>80</width>
          <height>24</height>
         </rect>
        </property>
        <property name="text">
-        <string>--.- A</string>
+        <string>----.- mbar</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>8</x>
+         <y>136</y>
+         <width>184</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wind speed avg._last 2 min :</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windSpeed">
+       <property name="geometry">
+        <rect>
+         <x>208</x>
+         <y>136</y>
+         <width>80</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>--.- km.h</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>16</x>
+         <y>168</y>
+         <width>176</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wind speed hi last 10 min :</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="windSpeed10min">
+       <property name="geometry">
+        <rect>
+         <x>208</x>
+         <y>168</y>
+         <width>80</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>--.- km.h</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
        </property>
       </widget>
      </widget>
@@ -299,7 +331,7 @@
        <rect>
         <x>16</x>
         <y>16</y>
-        <width>232</width>
+        <width>305</width>
         <height>104</height>
        </rect>
       </property>

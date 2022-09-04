@@ -73,6 +73,7 @@ int X2WeatherStation::execModalSettingsDialog()
     bool bPressedOK = false;
 
     char szTmpBuf[LOG_BUFFER_SIZE];
+    std::stringstream ssTmp;
     std::string sIpAddress;
     int nTcpPort;
 
@@ -97,22 +98,43 @@ int X2WeatherStation::execModalSettingsDialog()
     m_WeatherLink.getIpAddress(sIpAddress);
     dx->setPropertyString("IPAddress", "text", sIpAddress.c_str());
     m_WeatherLink.getTcpPort(nTcpPort);
-    snprintf(szTmpBuf, LOG_BUFFER_SIZE, "%d", nTcpPort );
-    dx->setPropertyString("tcpPort", "text", szTmpBuf);
+    ssTmp << nTcpPort;
+    dx->setPropertyString("tcpPort", "text", ssTmp.str().c_str());
+
 
     if(m_bLinked) { // we can't change the value for the ip and port if we're connected
         dx->setEnabled("IPAddress", false);
         dx->setEnabled("tcpPort", false);
         dx->setEnabled("pushButton", true);
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " ºC";
+        dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::dec << m_WeatherLink.getHumidity() << " %";
+        dx->setPropertyString("humidity", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " ºC";
+        dx->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getBarometricPressure() << " mbar";
+        dx->setPropertyString("pressure", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindSpeed() << " km/h";
+        dx->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindCondition() << " km/h";
+        dx->setPropertyString("windSpeed10min", "text", ssTmp.str().c_str());
     }
     else {
         dx->setEnabled("IPAddress", true);
         dx->setEnabled("tcpPort", true);
         dx->setEnabled("pushButton", false);
     }
-
-
-    m_WeatherLink.log("[execModalSettingsDialog] calling ui->exec");
 
     //Display the user interface
     if ((nErr = ui->exec(bPressedOK)))
@@ -136,6 +158,31 @@ int X2WeatherStation::execModalSettingsDialog()
 
 void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEvent)
 {
+    std::stringstream ssTmp;
+    if (!strcmp(pszEvent, "on_timer") && m_bLinked) {
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " ºC";
+        uiex->setPropertyString("temperature", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::dec << m_WeatherLink.getHumidity() << " %";
+        uiex->setPropertyString("humidity", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " ºC";
+        uiex->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getBarometricPressure() << " mbar";
+        uiex->setPropertyString("pressure", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindSpeed() << " km/h";
+        uiex->setPropertyString("windSpeed", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindCondition() << " km/h";
+        uiex->setPropertyString("windSpeed10min", "text", ssTmp.str().c_str());
+    }
 }
 
 void X2WeatherStation::driverInfoDetailedInfo(BasicStringInterface& str) const
@@ -229,7 +276,6 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 {
     int nErr = SB_OK;
     double dWindCond;
-    std::stringstream tmp;
 
     if(!m_bLinked)
         return ERR_NOLINK;
