@@ -153,7 +153,6 @@ void CWeatherLink::getFirmware(std::string &sFirmware)
 int CWeatherLink::getWindSpeedUnit(int &nUnit)
 {
     int nErr = PLUGIN_OK;
-
     nUnit = KPH;
     return nErr;
 }
@@ -185,7 +184,15 @@ int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
     m_sLogFile.flush();
 #endif
 
-    curl_easy_setopt(m_Curl, CURLOPT_URL, (m_sBaseUrl+sCmd).c_str());
+    res = curl_easy_setopt(m_Curl, CURLOPT_URL, (m_sBaseUrl+sCmd).c_str());
+    if(res != CURLE_OK) { // if this fails no need to keep going
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [domeCommandGET] curl_easy_setopt Error = " << res << std::endl;
+        m_sLogFile.flush();
+#endif
+        return ERR_CMDFAILED;
+    }
+
     curl_easy_setopt(m_Curl, CURLOPT_HTTPGET, 1L);
     curl_easy_setopt(m_Curl, CURLOPT_POST, 0L);
     curl_easy_setopt(m_Curl, CURLOPT_SSL_VERIFYPEER, 0L);
@@ -194,6 +201,7 @@ int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
     curl_easy_setopt(m_Curl, CURLOPT_WRITEDATA, &response_string);
     curl_easy_setopt(m_Curl, CURLOPT_HEADERDATA, &header_string);
     curl_easy_setopt(m_Curl, CURLOPT_FAILONERROR, 1);
+    curl_easy_setopt(m_Curl, CURLOPT_CONNECTTIMEOUT, 5); // 5 seconds timeout on connect
 
     // Perform the request, res will get the return code
     res = curl_easy_perform(m_Curl);

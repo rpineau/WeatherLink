@@ -229,17 +229,16 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
 {
     int nErr = SB_OK;
     double dWindCond;
+    std::stringstream tmp;
+
     if(!m_bLinked)
         return ERR_NOLINK;
 
-#ifdef PLUGIN_DEBUG
-    m_WeatherLink.log("weatherStationData");
-#endif
 
     X2MutexLocker ml(GetMutex());
 
-    // test data to understand what does what
-    nSecondsSinceGoodData = 900; // 15 minutes of good data tom test
+    nSecondsSinceGoodData = 1; // was 900 , aka 15 minutes ?
+    dAmbTemp = m_WeatherLink.getAmbianTemp();
     dWind = m_WeatherLink.getWindSpeed();
 	nPercentHumdity = int(m_WeatherLink.getHumidity());
 	dDewPointTemp = m_WeatherLink.getDewPointTemp();
@@ -251,17 +250,15 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     dWindCond = m_WeatherLink.getWindCondition();
 
     windCondition = x2WindCond::windCalm;
-    if (dWindCond > 10)
+    if (dWindCond >= 20) {
         windCondition = x2WindCond::windWindy;
-    else if (dWindCond > 20)
+    }
+    if (dWindCond >= 40) {
         windCondition = x2WindCond::windVeryWindy;
+    }
 
     rainCondition = nRainFlag==0?(x2RainCond::rainDry): (x2RainCond::rainRain);
 	nRoofCloseThisCycle = nRainFlag==0?0:1;
-
-#ifdef PLUGIN_DEBUG
-    m_WeatherLink.log("weatherStationData done");
-#endif
 
 	return nErr;
 }
@@ -270,9 +267,10 @@ WeatherStationDataInterface::x2WindSpeedUnit X2WeatherStation::windSpeedUnit()
 {
     WeatherStationDataInterface::x2WindSpeedUnit nUnit = WeatherStationDataInterface::x2WindSpeedUnit::windSpeedKph;
     int WeatherLinkUnit;
-
+    std::stringstream tmp;
 
     WeatherLinkUnit = m_WeatherLink.getWindSpeedUnit(WeatherLinkUnit);
+
     switch(WeatherLinkUnit) {
         case KPH:
             nUnit = WeatherStationDataInterface::x2WindSpeedUnit::windSpeedKph;
@@ -284,5 +282,6 @@ WeatherStationDataInterface::x2WindSpeedUnit X2WeatherStation::windSpeedUnit()
             nUnit = WeatherStationDataInterface::x2WindSpeedUnit::windSpeedMph;
             break;
     }
+
     return nUnit ;
 }
