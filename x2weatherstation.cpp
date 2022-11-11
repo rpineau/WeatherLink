@@ -79,21 +79,14 @@ int X2WeatherStation::execModalSettingsDialog()
 
     if (NULL == ui)
         return ERR_POINTER;
-
-    m_WeatherLink.log("[execModalSettingsDialog] trying to load WeatherLink.ui");
-
     if ((nErr = ui->loadUserInterface("WeatherLink.ui", deviceType(), m_nPrivateISIndex))) {
         return nErr;
     }
-
-    m_WeatherLink.log("[execModalSettingsDialog] WeatherLink.ui loaded");
 
     if (NULL == (dx = uiutil.X2DX())) {
         return ERR_POINTER;
     }
     X2MutexLocker ml(GetMutex());
-
-    m_WeatherLink.log("[execModalSettingsDialog] GetMutex called");
 
     m_WeatherLink.getIpAddress(sIpAddress);
     dx->setPropertyString("IPAddress", "text", sIpAddress.c_str());
