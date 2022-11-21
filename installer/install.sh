@@ -32,13 +32,13 @@ else
 	PLUGINS_DIR="PlugIns"
 fi
 
-cp "./weatherstationlist WeatherLinktxt" "$TheSkyX_Path/Resources/Common/Miscellaneous Files/"
+cp "./weatherstationlist WeatherLink.txt" "$TheSkyX_Path/Resources/Common/Miscellaneous Files/"
 cp "./libWeatherLink.so" "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/"
 cp "./WeatherLink.ui" "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/"
 
 app_owner=`/usr/bin/stat -c "%u" "$TheSkyX_Path" | xargs id -n -u`
 if [ ! -z "$app_owner" ]; then
-	chown $app_owner "$TheSkyX_Path/Resources/Common/Miscellaneous Files/weatherstationlist WeatherLinktxt"
+	chown $app_owner "$TheSkyX_Path/Resources/Common/Miscellaneous Files/weatherstationlist WeatherLink.txt"
 	chown $app_owner "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/libWeatherLink.so"
 	chown $app_owner "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/WeatherLink.ui"
 fi

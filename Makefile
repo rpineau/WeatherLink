@@ -6,16 +6,17 @@ CPPFLAGS = -fPIC -Wall -Wextra -O2 -g -DSB_LINUX_BUILD -std=gnu++11 -I. -I./../.
 LDFLAGS = -shared -lstdc++ -lcurl
 RM = rm -f
 STRIP = strip
-TARGET_LIB = Weatherlink.so
+TARGET_LIB = libWeatherLink.so
 
-SRCS = main.cpp x2weatherstation.cpp Weatherlink.cpp
+SRCS = main.cpp x2weatherstation.cpp WeatherLink.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 .PHONY: all
 all: ${TARGET_LIB}
 
 $(TARGET_LIB): $(OBJS)
-	$(CC) ${LDFLAGS} -o $@ $^
+	$(CC) ${LDFLAGS}  -o $@ $^
+	patchelf --add-needed  libcurl.so $@ 
 	$(STRIP) $@ >/dev/null 2>&1  || true
 
 $(SRCS:.cpp=.d):%.d:%.cpp
