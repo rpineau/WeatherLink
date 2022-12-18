@@ -32,6 +32,10 @@ else
 	PLUGINS_DIR="PlugIns"
 fi
 
+if [ ! -d "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/" ]; then
+        mkdir -p "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns"
+fi
+
 cp "./weatherstationlist WeatherLink.txt" "$TheSkyX_Path/Resources/Common/Miscellaneous Files/"
 cp "./libWeatherLink.so" "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/"
 cp "./WeatherLink.ui" "$TheSkyX_Path/Resources/Common/$PLUGINS_DIR/WeatherStationPlugIns/"
