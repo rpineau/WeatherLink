@@ -60,22 +60,22 @@ CWeatherLink::CWeatherLink()
 
 CWeatherLink::~CWeatherLink()
 {
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [~CWeatherLink] Called." << std::endl;
+    m_sLogFile.flush();
+#endif
+
+    if(m_bIsConnected) {
+        Disconnect();
+    }
+
+    curl_global_cleanup();
+
 #ifdef    PLUGIN_DEBUG
     // Close LogFile
     if(m_sLogFile.is_open())
         m_sLogFile.close();
 #endif
-    if(m_bIsConnected) {
-        curl_easy_cleanup(m_Curl);
-    }
-    if(m_ThreadsAreRunning) {
-        m_exitSignal->set_value();
-        m_th.join();
-        delete m_exitSignal;
-        m_exitSignal = nullptr;
-        m_ThreadsAreRunning = false;
-    }
-    curl_global_cleanup();
 }
 
 int CWeatherLink::Connect()
@@ -197,7 +197,7 @@ int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
     res = curl_easy_setopt(m_Curl, CURLOPT_URL, (m_sBaseUrl+sCmd).c_str());
     if(res != CURLE_OK) { // if this fails no need to keep going
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [domeCommandGET] curl_easy_setopt Error = " << res << std::endl;
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] curl_easy_setopt Error = " << res << std::endl;
         m_sLogFile.flush();
 #endif
         return ERR_CMDFAILED;
@@ -211,28 +211,28 @@ int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
     curl_easy_setopt(m_Curl, CURLOPT_WRITEDATA, &response_string);
     curl_easy_setopt(m_Curl, CURLOPT_HEADERDATA, &header_string);
     curl_easy_setopt(m_Curl, CURLOPT_FAILONERROR, 1);
-    curl_easy_setopt(m_Curl, CURLOPT_CONNECTTIMEOUT, 5); // 5 seconds timeout on connect
+    curl_easy_setopt(m_Curl, CURLOPT_CONNECTTIMEOUT, 3); // 3 seconds timeout on connect
 
     // Perform the request, res will get the return code
     res = curl_easy_perform(m_Curl);
     // Check for errors
     if(res != CURLE_OK) {
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [domeCommandGET] Error = " << nErr << std::endl;
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] Error = " << nErr << std::endl;
         m_sLogFile.flush();
 #endif
         return ERR_CMDFAILED;
     }
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [domeCommandGET] response = " << response_string << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] response = " << response_string << std::endl;
     m_sLogFile.flush();
 #endif
 
     sResp.assign(cleanupResponse(response_string,'\n'));
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [domeCommandGET] sResp = " << sResp << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] sResp = " << sResp << std::endl;
     m_sLogFile.flush();
 #endif
     return nErr;
