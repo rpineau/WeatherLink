@@ -65,6 +65,16 @@ CWeatherLink::~CWeatherLink()
     if(m_sLogFile.is_open())
         m_sLogFile.close();
 #endif
+    if(m_bIsConnected) {
+        curl_easy_cleanup(m_Curl);
+    }
+    if(m_ThreadsAreRunning) {
+        m_exitSignal->set_value();
+        m_th.join();
+        delete m_exitSignal;
+        m_exitSignal = nullptr;
+        m_ThreadsAreRunning = false;
+    }
     curl_global_cleanup();
 }
 

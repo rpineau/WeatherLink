@@ -122,6 +122,10 @@ int X2WeatherStation::execModalSettingsDialog()
         std::stringstream().swap(ssTmp);
         ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindCondition() << " km/h";
         dx->setPropertyString("windSpeed10min", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getRainCondition() << " cm";
+        dx->setPropertyString("rainfallLast15Min", "text", ssTmp.str().c_str());
     }
     else {
         dx->setEnabled("IPAddress", true);
@@ -175,6 +179,10 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
         std::stringstream().swap(ssTmp);
         ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getWindCondition() << " km/h";
         uiex->setPropertyString("windSpeed10min", "text", ssTmp.str().c_str());
+
+        std::stringstream().swap(ssTmp);
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getRainCondition() << " cm";
+        uiex->setPropertyString("rainfallLast15Min", "text", ssTmp.str().c_str());
     }
 }
 
