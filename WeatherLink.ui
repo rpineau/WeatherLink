@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>364</width>
-    <height>454</height>
+    <height>548</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>364</width>
-    <height>454</height>
+    <height>548</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>364</width>
-    <height>454</height>
+    <height>548</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -58,42 +58,11 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QLabel" name="label_logo_2">
-      <property name="geometry">
-       <rect>
-        <x>116</x>
-        <y>-8</y>
-        <width>256</width>
-        <height>90</height>
-       </rect>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="text">
-       <string notr="true"/>
-      </property>
-      <property name="pixmap">
-       <pixmap>PegasusAstro.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-      <property name="X2_PhotoFileName" stdset="0">
-       <string>PegasusAstro.png</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButtonCancel">
       <property name="geometry">
        <rect>
         <x>144</x>
-        <y>392</y>
+        <y>488</y>
         <width>81</width>
         <height>24</height>
        </rect>
@@ -109,7 +78,7 @@
       <property name="geometry">
        <rect>
         <x>240</x>
-        <y>392</y>
+        <y>488</y>
         <width>81</width>
         <height>24</height>
        </rect>
@@ -125,7 +94,7 @@
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>136</y>
+        <y>240</y>
         <width>305</width>
         <height>232</height>
        </rect>
@@ -143,7 +112,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Ambian Temperature :</string>
+        <string>Ambient Temperature :</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -271,7 +240,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>Wind speed avg._last 2 min :</string>
+        <string>Wind speed avg. last 2 min :</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -335,7 +304,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>rainfall last 15 min :</string>
+        <string>Rainfall last 15 min :</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -438,6 +407,109 @@
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>128</y>
+        <width>305</width>
+        <height>97</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Thresholds</string>
+      </property>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>32</x>
+         <y>32</y>
+         <width>96</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Windy (km/h) :</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>64</y>
+         <width>129</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Very Windy (km/h) :</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="geometry">
+        <rect>
+         <x>224</x>
+         <y>32</y>
+         <width>80</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_8">
+       <property name="geometry">
+        <rect>
+         <x>224</x>
+         <y>64</y>
+         <width>72</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>(will close)</string>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="WindyThreshold">
+       <property name="geometry">
+        <rect>
+         <x>144</x>
+         <y>32</y>
+         <width>72</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+      </widget>
+      <widget class="QDoubleSpinBox" name="VeryWindyThreshold">
+       <property name="geometry">
+        <rect>
+         <x>144</x>
+         <y>64</y>
+         <width>72</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
        </property>
       </widget>
      </widget>

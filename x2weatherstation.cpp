@@ -21,12 +21,18 @@ X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
 	m_pTickCount					= pTickCountIn;
     m_nPrivateISIndex               = nInstanceIndex;
 
+    int nCloseOnWindy;
+
 	m_bLinked = false;
     if (m_pIniUtil) {
         char szIpAddress[128];
         m_pIniUtil->readString(PARENT_KEY, CHILD_KEY_IP, "192.168.0.10", szIpAddress, 128);
         m_WeatherLink.setIpAddress(std::string(szIpAddress));
         m_WeatherLink.setTcpPort(m_pIniUtil->readInt(PARENT_KEY, CHILD_KEY_PORT, 80));
+        m_dWindyThreshold = m_pIniUtil->readDouble(PARENT_KEY, CHILD_KEY_WINDY, 20);
+        m_dVeryWindyThreshold = m_pIniUtil->readDouble(PARENT_KEY, CHILD_KEY_VERY_WINDY, 30);
+        nCloseOnWindy = m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_CLOSE_ON_WINDY,0);
+        m_bCloseOnWindy = nCloseOnWindy?true:false;
     }
 }
 
@@ -133,6 +139,16 @@ int X2WeatherStation::execModalSettingsDialog()
         dx->setEnabled("pushButton", false);
     }
 
+    if(m_bCloseOnWindy) {
+        dx->setChecked("checkBox", 1);
+    }
+    else {
+        dx->setChecked("checkBox", 0);
+    }
+
+    dx->setPropertyDouble("WindyThreshold", "value", m_dWindyThreshold);
+    dx->setPropertyDouble("VeryWindyThreshold", "value", m_dVeryWindyThreshold);
+
     //Display the user interface
     if ((nErr = ui->exec(bPressedOK)))
         return nErr;
@@ -149,6 +165,12 @@ int X2WeatherStation::execModalSettingsDialog()
             nErr |= m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_PORT, atoi(szTmpBuf));
             m_WeatherLink.setTcpPort( atoi(szTmpBuf));
         }
+        dx->propertyDouble("WindyThreshold", "value", m_dVeryWindyThreshold);
+        dx->propertyDouble("VeryWindyThreshold", "value", m_dVeryWindyThreshold);
+        m_bCloseOnWindy = (dx->isChecked("checkBox") == 1);
+        m_pIniUtil->writeDouble(PARENT_KEY, CHILD_KEY_WINDY, m_dWindyThreshold);
+        m_pIniUtil->writeDouble(PARENT_KEY, CHILD_KEY_VERY_WINDY, m_dVeryWindyThreshold);
+        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_CLOSE_ON_WINDY, m_bCloseOnWindy?1:0);
     }
     return nErr;
 }
@@ -289,7 +311,7 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     dWind = m_WeatherLink.getWindSpeed();
 	nPercentHumdity = int(m_WeatherLink.getHumidity());
 	dDewPointTemp = m_WeatherLink.getDewPointTemp();
-	nRainFlag = m_WeatherLink.getRainFlag()>=1?2:0;
+	nRainFlag = m_WeatherLink.getRainFlag()>0?2:0;
 	nWetFlag = nRainFlag;
 
     dBarometricPressure = m_WeatherLink.getBarometricPressure();
@@ -297,15 +319,19 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     dWindCond = m_WeatherLink.getWindCondition();
 
     windCondition = x2WindCond::windCalm;
-    if (dWindCond >= 20) {
+    if (dWindCond >= m_dWindyThreshold) {
         windCondition = x2WindCond::windWindy;
     }
-    if (dWindCond >= 40) {
+    if (dWindCond >= m_dVeryWindyThreshold) {
         windCondition = x2WindCond::windVeryWindy;
     }
 
     rainCondition = nRainFlag==0?(x2RainCond::rainDry): (x2RainCond::rainRain);
 	nRoofCloseThisCycle = nRainFlag==0?0:1;
+    if(!nRoofCloseThisCycle) {
+        if ((m_bCloseOnWindy && windCondition==x2WindCond::windWindy) || windCondition==x2WindCond::windVeryWindy )
+            nRoofCloseThisCycle = 1;
+    }
 
 	return nErr;
 }

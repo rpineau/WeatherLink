@@ -409,9 +409,10 @@ int CWeatherLink::parseType1(json jData)
     m_dWindSpeed = jData.at("wind_speed_avg_last_2_min").get<double>()*1.60934; // Converted to kph
     m_dPercentHumdity = jData.at("hum").get<double>();
     m_dDewPointTemp = (jData.at("dew_point").get<double>() -32)/1.8;  // converted to Celsius
-    m_dRainFlag =  jData.at("rain_rate_hi").get<double>() * 2.54; // convert to cm/h -> we might need a /100 based on test done and weather link web site data
+    // m_dRainFlag =  jData.at("rain_rate_hi").get<double>() / 100.0 * 2.54; // convert to cm/h -> we might need a /100 based on test done and weather link web site data
     m_dWindCondition = jData.at("wind_speed_hi_last_10_min").get<double>()*1.60934; // Converted to kph
-    m_dRainCondition = jData.at("rainfall_last_15_min").get<double>() * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
+    m_dRainCondition = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
+    m_dRainFlag = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
     return nErr;
 }
 

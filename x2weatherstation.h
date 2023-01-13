@@ -28,6 +28,10 @@
 #define PARENT_KEY      "WeatherLink"
 #define CHILD_KEY_IP    "IPAddress"
 #define CHILD_KEY_PORT  "IPPort"
+#define CHILD_KEY_WINDY  "Windy"
+#define CHILD_KEY_CLOSE_ON_WINDY  "CloseOnWindy"
+
+#define CHILD_KEY_VERY_WINDY  "VeryWindy"
 
 #define LOG_BUFFER_SIZE 8192
 
@@ -152,6 +156,10 @@ private:
 
     int         m_nPrivateISIndex;
 	bool m_bLinked;
+
+    double          m_dWindyThreshold;
+    bool            m_bCloseOnWindy;
+    double          m_dVeryWindyThreshold;
 
     CWeatherLink        m_WeatherLink;
 
