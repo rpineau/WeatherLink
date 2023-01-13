@@ -1,10 +1,10 @@
 
 #include "x2weatherstation.h"
 
-X2WeatherStation::X2WeatherStation(const char* pszDisplayName, 
+X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
 												const int& nInstanceIndex,
-												SerXInterface						* pSerXIn, 
-												TheSkyXFacadeForDriversInterface	* pTheSkyXIn, 
+												SerXInterface						* pSerXIn,
+												TheSkyXFacadeForDriversInterface	* pTheSkyXIn,
 												SleeperInterface					* pSleeperIn,
 												BasicIniUtilInterface				* pIniUtilIn,
 												LoggerInterface						* pLoggerIn,
@@ -12,11 +12,11 @@ X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
 												TickCountInterface					* pTickCountIn)
 
 {
-	m_pSerX							= pSerXIn;		
+	m_pSerX							= pSerXIn;
 	m_pTheSkyXForMounts				= pTheSkyXIn;
 	m_pSleeper						= pSleeperIn;
 	m_pIniUtil						= pIniUtilIn;
-	m_pLogger						= pLoggerIn;	
+	m_pLogger						= pLoggerIn;
 	m_pIOMutex						= pIOMutexIn;
 	m_pTickCount					= pTickCountIn;
     m_nPrivateISIndex               = nInstanceIndex;
@@ -106,7 +106,7 @@ int X2WeatherStation::execModalSettingsDialog()
         dx->setEnabled("tcpPort", false);
         dx->setEnabled("pushButton", true);
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " ºC";
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " C";
         dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -114,7 +114,7 @@ int X2WeatherStation::execModalSettingsDialog()
         dx->setPropertyString("humidity", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " ºC";
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " C";
         dx->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -179,7 +179,7 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
 {
     std::stringstream ssTmp;
     if (!strcmp(pszEvent, "on_timer") && m_bLinked) {
-        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " ºC";
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " C";
         uiex->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -187,7 +187,7 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
         uiex->setPropertyString("humidity", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
-        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " ºC";
+        ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getDewPointTemp() << " C";
         uiex->setPropertyString("dewPoint", "text", ssTmp.str().c_str());
 
         std::stringstream().swap(ssTmp);
@@ -210,8 +210,10 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
 
 void X2WeatherStation::driverInfoDetailedInfo(BasicStringInterface& str) const
 {
+    str = "WeatherLink Live for Davis weather station";
 }
-double X2WeatherStation::driverInfoVersion(void) const							
+
+double X2WeatherStation::driverInfoVersion(void) const
 {
 	return PLUGIN_VERSION;
 }
@@ -303,7 +305,6 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     if(!m_bLinked)
         return ERR_NOLINK;
 
-
     X2MutexLocker ml(GetMutex());
 
     nSecondsSinceGoodData = 1; // was 900 , aka 15 minutes ?
@@ -319,9 +320,11 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     dWindCond = m_WeatherLink.getWindCondition();
 
     windCondition = x2WindCond::windCalm;
+
     if (dWindCond >= m_dWindyThreshold) {
         windCondition = x2WindCond::windWindy;
     }
+
     if (dWindCond >= m_dVeryWindyThreshold) {
         windCondition = x2WindCond::windVeryWindy;
     }
@@ -329,8 +332,9 @@ int X2WeatherStation::weatherStationData(double& dSkyTemp,
     rainCondition = nRainFlag==0?(x2RainCond::rainDry): (x2RainCond::rainRain);
 	nRoofCloseThisCycle = nRainFlag==0?0:1;
     if(!nRoofCloseThisCycle) {
-        if ((m_bCloseOnWindy && windCondition==x2WindCond::windWindy) || windCondition==x2WindCond::windVeryWindy )
+        if ((m_bCloseOnWindy && windCondition==x2WindCond::windWindy) || windCondition==x2WindCond::windVeryWindy )  {
             nRoofCloseThisCycle = 1;
+        }
     }
 
 	return nErr;
