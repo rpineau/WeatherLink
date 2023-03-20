@@ -23,7 +23,6 @@ void threaded_poller(std::future<void> futureObj, CWeatherLink *WeatherLinkContr
 CWeatherLink::CWeatherLink()
 {
     // set some sane values
-    m_pSerx = NULL;
     m_bIsConnected = false;
     m_ThreadsAreRunning = false;
     m_sIpAddress.clear();

@@ -44,7 +44,6 @@
 
 
 #include "../../licensedinterfaces/sberrorx.h"
-#include "../../licensedinterfaces/serxinterface.h"
 
 #include "json.hpp"
 using json = nlohmann::json;
@@ -109,7 +108,6 @@ public:
 protected:
 
     bool            m_bIsConnected;
-    SerXInterface   *m_pSerx;
     std::string     m_sFirmware;
     std::string     m_sModel;
     double          m_dFirmwareVersion;
