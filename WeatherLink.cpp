@@ -193,6 +193,11 @@ int CWeatherLink::isSafe(bool &bSafe)
 void CWeatherLink::setTempTxId(int nTxId)
 {
     m_nTxIdTemp = nTxId;
+    if(!m_bIsConnected)
+        return;
+
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+    getData();
 }
 
 int CWeatherLink::getTempTxId()
@@ -203,6 +208,11 @@ int CWeatherLink::getTempTxId()
 void CWeatherLink::setWindTxId(int nTxId)
 {
     m_nTxIdWind = nTxId;
+    if(!m_bIsConnected)
+        return;
+
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+    getData();
 }
 
 int CWeatherLink::getWindTxId()
@@ -213,6 +223,11 @@ int CWeatherLink::getWindTxId()
 void CWeatherLink::setRainTxId(int nTxId)
 {
     m_nTxIdRain = nTxId;
+    if(!m_bIsConnected)
+        return;
+
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+    getData();
 }
 
 int CWeatherLink::getRainTxId()
@@ -223,6 +238,11 @@ int CWeatherLink::getRainTxId()
 void CWeatherLink::setHumTxId(int nTxId)
 {
     m_nTxIdHum = nTxId;
+    if(!m_bIsConnected)
+        return;
+
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+    getData();
 }
 
 int CWeatherLink::getHumTxId()
@@ -233,6 +253,11 @@ int CWeatherLink::getHumTxId()
 void CWeatherLink::setDewTxId(int nTxId)
 {
     m_nTxIdDew = nTxId;
+    if(!m_bIsConnected)
+        return;
+
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+    getData();
 }
 
 int CWeatherLink::getDewTxId()
@@ -491,6 +516,8 @@ int CWeatherLink::getTxIds()
     std::string response_string;
     std::string weatherLinkError;
 
+    const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
+
     if(!m_bIsConnected || !m_Curl)
         return ERR_COMMNOLINK;
 
@@ -650,7 +677,6 @@ int CWeatherLink::parseType3(json jData)
 int CWeatherLink::parseType4(json jData)
 {
     int nErr = PLUGIN_OK;
-    int nTxId;
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [parseType4] json data : " << jData << std::endl;
