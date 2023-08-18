@@ -354,7 +354,7 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
 
 void X2WeatherStation::driverInfoDetailedInfo(BasicStringInterface& str) const
 {
-    str = "WeatherLink Live for Davis weather station";
+    str = "WeatherLink Live X2 plugin for Davis weather station by Rodolphe Pineau";
 }
 
 double X2WeatherStation::driverInfoVersion(void) const
@@ -407,7 +407,7 @@ int	X2WeatherStation::establishLink(void)
     else
         m_bLinked = true;
 
-	return SB_OK;
+	return nErr;
 }
 int	X2WeatherStation::terminateLink(void)
 {

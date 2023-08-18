@@ -119,13 +119,20 @@ int CWeatherLink::Connect()
 
     
     nErr = getData();
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    nErr |= getTxIds();
     if (nErr) {
         curl_easy_cleanup(m_Curl);
         m_Curl = nullptr;
         m_bIsConnected = false;
-        return nErr;
+        return ERR_COMMNOLINK;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    nErr = getTxIds();
+    if (nErr) {
+        curl_easy_cleanup(m_Curl);
+        m_Curl = nullptr;
+        m_bIsConnected = false;
+        return ERR_CMDFAILED;
     }
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
@@ -397,7 +404,7 @@ int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
     // Check for errors
     if(res != CURLE_OK) {
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
-        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] Error = " << nErr << std::endl;
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [doGET] Error = " << res << std::endl;
         m_sLogFile.flush();
 #endif
         return ERR_CMDFAILED;
