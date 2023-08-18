@@ -33,6 +33,12 @@ X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
         m_dVeryWindyThreshold = m_pIniUtil->readDouble(PARENT_KEY, CHILD_KEY_VERY_WINDY, 30);
         nCloseOnWindy = m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_CLOSE_ON_WINDY,0);
         m_bCloseOnWindy = nCloseOnWindy?true:false;
+        
+        m_WeatherLink.setTempTxId(m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_TxIdTemp,1));
+        m_WeatherLink.setWindTxId(m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_TxIdWind,1));
+        m_WeatherLink.setRainTxId(m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_TxIdRain,1));
+        m_WeatherLink.setHumTxId(m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_TxIdHum,1));
+        m_WeatherLink.setDewTxId(m_pIniUtil->readInt(PARENT_KEY,CHILD_KEY_TxIdDew,1));
     }
 }
 
@@ -82,7 +88,11 @@ int X2WeatherStation::execModalSettingsDialog()
     std::stringstream ssTmp;
     std::string sIpAddress;
     int nTcpPort;
-
+    int nId;
+    int j;
+    std::vector<int> txIds;
+    std::vector<int>::iterator itr;
+    
     if (NULL == ui)
         return ERR_POINTER;
     if ((nErr = ui->loadUserInterface("WeatherLink.ui", deviceType(), m_nPrivateISIndex))) {
@@ -109,6 +119,52 @@ int X2WeatherStation::execModalSettingsDialog()
         ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " C";
         dx->setPropertyString("temperature", "text", ssTmp.str().c_str());
 
+        txIds = m_WeatherLink.getTempTxIds();
+        for( int i : txIds) {
+            dx->comboBoxAppendString("comboBox",std::to_string(i).c_str());
+        }
+        nId = m_WeatherLink.getTempTxId();
+        itr = std::find(txIds.begin(), txIds.end(), nId);
+        j = (int) std::distance(txIds.begin(), itr);
+        dx->setCurrentIndex("comboBox",j);
+
+        txIds = m_WeatherLink.getWindTxIds();
+        for( int i : txIds) {
+            dx->comboBoxAppendString("comboBox_2",std::to_string(i).c_str());
+        }
+        nId = m_WeatherLink.getWindTxId();
+        itr = std::find(txIds.begin(), txIds.end(), nId);
+        j = (int) std::distance(txIds.begin(), itr);
+        dx->setCurrentIndex("comboBox_2",j);
+
+        txIds = m_WeatherLink.getRainTxIds();
+        for( int i : txIds) {
+            dx->comboBoxAppendString("comboBox_3",std::to_string(i).c_str());
+        }
+        nId = m_WeatherLink.getRainTxId();
+        itr = std::find(txIds.begin(), txIds.end(), nId);
+        j = (int) std::distance(txIds.begin(), itr);
+        dx->setCurrentIndex("comboBox_3",j);
+
+        txIds = m_WeatherLink.getHumTxIds();
+        for( int i : txIds) {
+            dx->comboBoxAppendString("comboBox_4",std::to_string(i).c_str());
+        }
+        nId = m_WeatherLink.getHumTxId();
+        itr = std::find(txIds.begin(), txIds.end(), nId);
+        j = (int) std::distance(txIds.begin(), itr);
+        dx->setCurrentIndex("comboBox_4",j);
+
+        txIds = m_WeatherLink.getDewTxIds();
+        for( int i : txIds) {
+            dx->comboBoxAppendString("comboBox_5",std::to_string(i).c_str());
+        }
+        nId = m_WeatherLink.getDewTxId();
+        itr = std::find(txIds.begin(), txIds.end(), nId);
+        j = (int) std::distance(txIds.begin(), itr);
+        dx->setCurrentIndex("comboBox_4",j);
+
+        
         std::stringstream().swap(ssTmp);
         ssTmp<< std::dec << m_WeatherLink.getHumidity() << " %";
         dx->setPropertyString("humidity", "text", ssTmp.str().c_str());

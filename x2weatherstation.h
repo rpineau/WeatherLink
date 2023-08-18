@@ -4,6 +4,7 @@
 #define __X2WeatherStation_H_
 
 #include <string.h>
+#include <iterator>
 
 #include "../../licensedinterfaces/theskyxfacadefordriversinterface.h"
 #include "../../licensedinterfaces/sleeperinterface.h"
@@ -30,8 +31,13 @@
 #define CHILD_KEY_PORT  "IPPort"
 #define CHILD_KEY_WINDY  "Windy"
 #define CHILD_KEY_CLOSE_ON_WINDY  "CloseOnWindy"
-
 #define CHILD_KEY_VERY_WINDY  "VeryWindy"
+
+#define CHILD_KEY_TxIdTemp  "TxIdTemp"
+#define CHILD_KEY_TxIdWind  "TxIdWind"
+#define CHILD_KEY_TxIdRain  "TxIdRain"
+#define CHILD_KEY_TxIdHum   "TxIdHum"
+#define CHILD_KEY_TxIdDew   "TxIdDew"
 
 #define LOG_BUFFER_SIZE 8192
 

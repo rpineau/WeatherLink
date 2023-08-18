@@ -50,7 +50,7 @@ using json = nlohmann::json;
 
 #define PLUGIN_VERSION      1.0
 
-// #define PLUGIN_DEBUG 3
+#define PLUGIN_DEBUG 3
 
 #define SERIAL_BUFFER_SIZE 256
 #define MAX_TIMEOUT 500
@@ -81,9 +81,27 @@ public:
     double      getAmbientTemp();
     int         isSafe(bool &bSafe);
 
+    void        setTempTxId(int nTxId);
+    int         getTempTxId();
+    void        setWindTxId(int nTxId);
+    int         getWindTxId();
+    void        setRainTxId(int nTxId);
+    int         getRainTxId();
+    void        setHumTxId(int nTxId);
+    int         getHumTxId();
+    void        setDewTxId(int nTxId);
+    int         getDewTxId();
+
+    std::vector<int>& getTempTxIds();
+    std::vector<int>& getWindTxIds();
+    std::vector<int>& getRainTxIds();
+    std::vector<int>& getHumTxIds();
+    std::vector<int>& getDewTxIds();
+
     std::mutex  m_DevAccessMutex;
     int         getData();
-
+    int         getTxIds();
+    
     static size_t writeFunction(void* ptr, size_t size, size_t nmemb, void* data);
 
     void getIpAddress(std::string &IpAddress);
@@ -141,6 +159,18 @@ protected:
     int             getModelName();
     int             getFirmwareVersion();
     
+    std::atomic<int>    m_nTxIdTemp;
+    std::atomic<int>    m_nTxIdWind;
+    std::atomic<int>    m_nTxIdRain;
+    std::atomic<int>    m_nTxIdHum;
+    std::atomic<int>    m_nTxIdDew;
+
+    std::vector<int>    m_vTxIdTemp;
+    std::vector<int>    m_vTxIdWind;
+    std::vector<int>    m_vTxIdRain;
+    std::vector<int>    m_vTxIdHum;
+    std::vector<int>    m_vTxIdDew;
+
     int             parseType1(json jResp);
     int             parseType2(json jResp);
     int             parseType3(json jResp);
@@ -151,7 +181,7 @@ protected:
     std::string&    rtrim(std::string &str, const std::string &filter);
     std::string     findField(std::vector<std::string> &svFields, const std::string& token);
 
-
+    
 #ifdef PLUGIN_DEBUG
     // timestamp for logs
     const std::string getTimeStamp();

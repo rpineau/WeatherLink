@@ -28,6 +28,18 @@ CWeatherLink::CWeatherLink()
     m_sIpAddress.clear();
     m_nTcpPort = 0;
 
+    m_nTxIdTemp = 1;
+    m_nTxIdWind = 1;
+    m_nTxIdRain = 1;
+    m_nTxIdHum = 1;
+    m_nTxIdDew = 1;
+
+    m_vTxIdTemp.clear();
+    m_vTxIdWind.clear();
+    m_vTxIdRain.clear();
+    m_vTxIdHum.clear();
+    m_vTxIdDew.clear();
+
 #ifdef PLUGIN_DEBUG
 #if defined(SB_WIN_BUILD)
     m_sLogfilePath = getenv("HOMEDRIVE");
@@ -106,12 +118,15 @@ int CWeatherLink::Connect()
 
     
     nErr = getData();
+    nErr |= getTxIds();
     if (nErr) {
         curl_easy_cleanup(m_Curl);
         m_Curl = nullptr;
         m_bIsConnected = false;
         return nErr;
     }
+    
+    
     if(!m_ThreadsAreRunning) {
         m_exitSignal = new std::promise<void>();
         m_futureObj = m_exitSignal->get_future();
@@ -175,6 +190,80 @@ int CWeatherLink::isSafe(bool &bSafe)
     return nErr;
 }
 
+void CWeatherLink::setTempTxId(int nTxId)
+{
+    m_nTxIdTemp = nTxId;
+}
+
+int CWeatherLink::getTempTxId()
+{
+    return m_nTxIdTemp;
+}
+
+void CWeatherLink::setWindTxId(int nTxId)
+{
+    m_nTxIdWind = nTxId;
+}
+
+int CWeatherLink::getWindTxId()
+{
+    return m_nTxIdWind;
+}
+
+void CWeatherLink::setRainTxId(int nTxId)
+{
+    m_nTxIdRain = nTxId;
+}
+
+int CWeatherLink::getRainTxId()
+{
+    return m_nTxIdRain;
+}
+
+void CWeatherLink::setHumTxId(int nTxId)
+{
+    m_nTxIdHum = nTxId;
+}
+
+int CWeatherLink::getHumTxId()
+{
+    return m_nTxIdHum;
+}
+
+void CWeatherLink::setDewTxId(int nTxId)
+{
+    m_nTxIdDew = nTxId;
+}
+
+int CWeatherLink::getDewTxId()
+{
+    return m_nTxIdDew;
+}
+
+std::vector<int>& CWeatherLink::getTempTxIds()
+{
+    return m_vTxIdTemp;
+}
+
+std::vector<int>& CWeatherLink::getWindTxIds()
+{
+    return m_vTxIdWind;
+}
+
+std::vector<int>& CWeatherLink::getRainTxIds()
+{
+    return m_vTxIdRain;
+}
+
+std::vector<int>& CWeatherLink::getHumTxIds()
+{
+    return m_vTxIdHum;
+}
+
+std::vector<int>& CWeatherLink::getDewTxIds()
+{
+    return m_vTxIdDew;
+}
 
 int CWeatherLink::doGET(std::string sCmd, std::string &sResp)
 {
@@ -395,23 +484,140 @@ int CWeatherLink::getData()
     return nErr;
 }
 
+int CWeatherLink::getTxIds()
+{
+    int nErr = PLUGIN_OK;
+    json jResp;
+    std::string response_string;
+    std::string weatherLinkError;
+
+    if(!m_bIsConnected || !m_Curl)
+        return ERR_COMMNOLINK;
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] Called." << std::endl;
+    m_sLogFile.flush();
+#endif
+
+    m_vTxIdTemp.clear();
+    m_vTxIdWind.clear();
+    m_vTxIdRain.clear();
+    m_vTxIdHum.clear();
+    m_vTxIdDew.clear();
+    
+    // do http GET request to PLC got get current Az or Ticks .. TBD
+    nErr = doGET("/v1/current_conditions", response_string);
+    if(nErr) {
+        return ERR_CMDFAILED;
+    }
+
+    // process response_string
+    try {
+        jResp = json::parse(response_string);
+        if(jResp.at("error").is_null()) {
+            for (auto& jElement : jResp.at("data").at("conditions").items()) {
+                if(jElement.value().at("data_structure_type").get<int>() == 1) {
+                    if(!jElement.value().at("temp").empty())
+                        m_vTxIdTemp.push_back(jElement.value().at("txid").get<int>());
+                    if(!jElement.value().at("wind_speed_avg_last_2_min").empty())
+                        m_vTxIdWind.push_back(jElement.value().at("txid").get<int>());
+                    if(!jElement.value().at("rainfall_last_15_min").empty())
+                        m_vTxIdRain.push_back(jElement.value().at("txid").get<int>());
+                    if(!jElement.value().at("hum").empty())
+                        m_vTxIdHum.push_back(jElement.value().at("txid").get<int>());
+                    if(!jElement.value().at("dew_point").empty())
+                        m_vTxIdDew.push_back(jElement.value().at("txid").get<int>());
+                }
+            }
+        }
+        else {
+            weatherLinkError = jResp.at("error").get<std::string>();
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+            m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] Weatherlink error : " << weatherLinkError << std::endl;
+            m_sLogFile.flush();
+#endif
+            return ERR_CMDFAILED;
+        }
+    }
+    catch (json::exception& e) {
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] json exception : " << e.what() << " - " << e.id << std::endl;
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] json exception response : " << response_string << std::endl;
+        m_sLogFile.flush();
+#endif
+        return ERR_CMDFAILED;
+    }
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdTemp.size()     : " << m_vTxIdTemp.size() << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdWind.size()     : " << m_vTxIdWind.size() << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdRain.size()     : " << m_vTxIdRain.size() << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdHum.size()      : " << m_vTxIdHum.size() << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdDew.size()      : " << m_vTxIdDew.size() << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] m_vTxIdTemp.size()     : " << m_vTxIdTemp.size() << std::endl;
+    m_sLogFile.flush();
+#endif
+
+    return nErr;
+}
+
+
+
 
 int CWeatherLink::parseType1(json jData)
 {
     int nErr = PLUGIN_OK;
-
+    int nTxId;
+    
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [parseType1] json data : " << jData << std::endl;
     m_sLogFile.flush();
 #endif
-    m_dTemp =  (jData.at("temp").get<double>() -32)/1.8; // converted to Celsius
-    m_dWindSpeed = jData.at("wind_speed_avg_last_2_min").get<double>()*1.60934; // Converted to kph
-    m_dPercentHumdity = jData.at("hum").get<double>();
-    m_dDewPointTemp = (jData.at("dew_point").get<double>() -32)/1.8;  // converted to Celsius
-    // m_dRainFlag =  jData.at("rain_rate_hi").get<double>() / 100.0 * 2.54; // convert to cm/h -> we might need a /100 based on test done and weather link web site data
-    m_dWindCondition = jData.at("wind_speed_hi_last_10_min").get<double>()*1.60934; // Converted to kph
-    m_dRainCondition = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
-    m_dRainFlag = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
+    nTxId = jData.at("txid").get<int>();
+    if(m_nTxIdTemp == nTxId) {
+        if(!jData.at("temp").empty())
+            m_dTemp =  (jData.at("temp").get<double>() -32)/1.8; // converted to Celsius
+        else
+            m_dTemp = -273.15;
+    }
+    if(m_nTxIdWind== nTxId) {
+        if(!jData.at("wind_speed_avg_last_2_min").empty())
+            m_dWindSpeed = jData.at("wind_speed_avg_last_2_min").get<double>()*1.60934; // Converted to kph
+        else
+            m_dWindSpeed = -1;
+        
+        if(!jData.at("wind_speed_hi_last_10_min").empty())
+            m_dWindCondition = jData.at("wind_speed_hi_last_10_min").get<double>()*1.60934; // Converted to kph
+        else
+            m_dWindCondition = -1;
+    }
+    
+    if(m_nTxIdRain== nTxId) {
+        // m_dRainFlag =  jData.at("rain_rate_hi").get<double>() / 100.0 * 2.54; // convert to cm/h -> we might need a /100 based on test done and weather link web site data
+        if(!jData.at("rainfall_last_15_min").empty())
+            m_dRainCondition = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
+        else
+            m_dRainCondition = -1;
+        
+        if(!jData.at("rainfall_last_15_min").empty())
+            m_dRainFlag = jData.at("rainfall_last_15_min").get<double>() / 100.0 * 2.54; // convert to cm -> we might need a /100 based on test done and weather link web site data
+        else
+            m_dRainFlag = -1;
+    }
+
+    if(m_nTxIdHum== nTxId) {
+        if(!jData.at("hum").empty())
+            m_dPercentHumdity = jData.at("hum").get<double>();
+        else
+            m_dPercentHumdity = -1;
+    }
+
+    if(m_nTxIdDew== nTxId) {
+        if(!jData.at("dew_point").empty())
+            m_dDewPointTemp = (jData.at("dew_point").get<double>() -32)/1.8;  // converted to Celsius
+        else
+            m_dDewPointTemp = -273.15;
+    }
     return nErr;
 }
 
@@ -444,6 +650,7 @@ int CWeatherLink::parseType3(json jData)
 int CWeatherLink::parseType4(json jData)
 {
     int nErr = PLUGIN_OK;
+    int nTxId;
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [parseType4] json data : " << jData << std::endl;
