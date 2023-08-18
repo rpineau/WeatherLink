@@ -24,6 +24,8 @@ X2WeatherStation::X2WeatherStation(const char* pszDisplayName,
     int nCloseOnWindy;
 
 	m_bLinked = false;
+    m_bUiEnabled = false;
+
     if (m_pIniUtil) {
         char szIpAddress[128];
         m_pIniUtil->readString(PARENT_KEY, CHILD_KEY_IP, "192.168.0.10", szIpAddress, 128);
@@ -92,7 +94,9 @@ int X2WeatherStation::execModalSettingsDialog()
     int j;
     std::vector<int> txIds;
     std::vector<int>::iterator itr;
-    
+
+    m_bUiEnabled = false;
+
     if (NULL == ui)
         return ERR_POINTER;
     if ((nErr = ui->loadUserInterface("WeatherLink.ui", deviceType(), m_nPrivateISIndex))) {
@@ -213,6 +217,8 @@ int X2WeatherStation::execModalSettingsDialog()
     dx->setPropertyDouble("WindyThreshold", "value", m_dWindyThreshold);
     dx->setPropertyDouble("VeryWindyThreshold", "value", m_dVeryWindyThreshold);
 
+    m_bUiEnabled = true;
+
     //Display the user interface
     if ((nErr = ui->exec(bPressedOK)))
         return nErr;
@@ -236,25 +242,27 @@ int X2WeatherStation::execModalSettingsDialog()
         m_pIniUtil->writeDouble(PARENT_KEY, CHILD_KEY_VERY_WINDY, m_dVeryWindyThreshold);
         m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_CLOSE_ON_WINDY, m_bCloseOnWindy?1:0);
 
-        nId = dx->currentIndex("comboBox");
-        txIds = m_WeatherLink.getTempTxIds();
-        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdTemp, txIds.at(nId));
+        if(m_bLinked) {
+            nId = dx->currentIndex("comboBox");
+            txIds = m_WeatherLink.getTempTxIds();
+            m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdTemp, txIds.at(nId));
 
-        nId = dx->currentIndex("comboBox_2");
-        txIds = m_WeatherLink.getWindTxIds();
-        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdWind, txIds.at(nId));
+            nId = dx->currentIndex("comboBox_2");
+            txIds = m_WeatherLink.getWindTxIds();
+            m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdWind, txIds.at(nId));
 
-        nId = dx->currentIndex("comboBox_3");
-        txIds = m_WeatherLink.getRainTxIds();
-        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdRain, txIds.at(nId));
+            nId = dx->currentIndex("comboBox_3");
+            txIds = m_WeatherLink.getRainTxIds();
+            m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdRain, txIds.at(nId));
 
-        nId = dx->currentIndex("comboBox_4");
-        txIds = m_WeatherLink.getHumTxIds();
-        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdHum, txIds.at(nId));
+            nId = dx->currentIndex("comboBox_4");
+            txIds = m_WeatherLink.getHumTxIds();
+            m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdHum, txIds.at(nId));
 
-        nId = dx->currentIndex("comboBox_5");
-        txIds = m_WeatherLink.getDewTxIds();
-        m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdDew, txIds.at(nId));
+            nId = dx->currentIndex("comboBox_5");
+            txIds = m_WeatherLink.getDewTxIds();
+            m_pIniUtil->writeInt(PARENT_KEY, CHILD_KEY_TxIdDew, txIds.at(nId));
+        }
     }
     return nErr;
 }
@@ -264,6 +272,11 @@ void X2WeatherStation::uiEvent(X2GUIExchangeInterface* uiex, const char* pszEven
     std::stringstream ssTmp;
     int nIdx;
     std::vector<int> txIds;
+
+    // the test for m_bUiEnabled is done because even if the UI is not displayed we get events on the comboBox changes when we fill it.
+    if(!m_bLinked | !m_bUiEnabled)
+        return;
+
 
     if (!strcmp(pszEvent, "on_timer") && m_bLinked) {
         ssTmp<< std::fixed << std::setprecision(2) << m_WeatherLink.getAmbianTemp() << " C";

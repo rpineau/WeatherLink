@@ -160,12 +160,13 @@ private:
 	TickCountInterface						*GetTickCountInterface() {return m_pTickCount;}
 
 
-    int         m_nPrivateISIndex;
-	bool m_bLinked;
+    int     m_nPrivateISIndex;
+	bool    m_bLinked;
 
-    double          m_dWindyThreshold;
-    bool            m_bCloseOnWindy;
-    double          m_dVeryWindyThreshold;
+    double  m_dWindyThreshold;
+    bool    m_bCloseOnWindy;
+    double  m_dVeryWindyThreshold;
+    bool    m_bUiEnabled;
 
     CWeatherLink        m_WeatherLink;
 

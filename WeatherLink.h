@@ -48,9 +48,9 @@
 #include "json.hpp"
 using json = nlohmann::json;
 
-#define PLUGIN_VERSION      1.0
+#define PLUGIN_VERSION      1.1
 
-#define PLUGIN_DEBUG 3
+// #define PLUGIN_DEBUG 3
 
 #define SERIAL_BUFFER_SIZE 256
 #define MAX_TIMEOUT 500

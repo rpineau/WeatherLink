@@ -93,6 +93,7 @@ int CWeatherLink::Connect()
 {
     int nErr = SB_OK;
     std::string sDummy;
+    std::vector<int>::iterator itr;
 
 #if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
     m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] Called." << std::endl;
@@ -118,6 +119,7 @@ int CWeatherLink::Connect()
 
     
     nErr = getData();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     nErr |= getTxIds();
     if (nErr) {
         curl_easy_cleanup(m_Curl);
@@ -125,7 +127,46 @@ int CWeatherLink::Connect()
         m_bIsConnected = false;
         return nErr;
     }
-    
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] Getting txIds" << std::endl;
+    m_sLogFile.flush();
+#endif
+
+    // check that the txids set on plugin load are still valid
+    itr = std::find(m_vTxIdTemp.begin(), m_vTxIdTemp.end(), m_nTxIdTemp);
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] Temp *itr : " << *itr << std::endl;
+    m_sLogFile.flush();
+#endif
+    if(itr == std::end(m_vTxIdTemp))
+        m_nTxIdTemp = 1; // reset to 1 as the value set was not valid
+
+    itr = std::find(m_vTxIdWind.begin(), m_vTxIdWind.end(), m_nTxIdWind);
+    if(itr == std::end(m_vTxIdWind))
+        m_nTxIdWind = 1; // reset to 1 as the value set was not valid
+
+    itr = std::find(m_vTxIdRain.begin(), m_vTxIdRain.end(), m_nTxIdRain);
+    if(itr == std::end(m_vTxIdRain))
+        m_nTxIdRain = 1; // reset to 1 as the value set was not valid
+
+    itr = std::find(m_vTxIdHum.begin(), m_vTxIdHum.end(), m_nTxIdHum);
+    if(itr == std::end(m_vTxIdHum))
+        m_nTxIdHum = 1; // reset to 1 as the value set was not valid
+
+    itr = std::find(m_vTxIdDew.begin(), m_vTxIdDew.end(), m_nTxIdDew);
+    if(itr == std::end(m_vTxIdDew))
+        m_nTxIdDew = 1; // reset to 1 as the value set was not valid
+
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] m_nTxIdTemp : " << m_nTxIdTemp << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] m_nTxIdWind : " << m_nTxIdWind << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] m_nTxIdRain : " << m_nTxIdRain << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] m_nTxIdHum  : " << m_nTxIdHum << std::endl;
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [Connect] m_nTxIdDew  : " << m_nTxIdDew << std::endl;
+    m_sLogFile.flush();
+#endif
+
     
     if(!m_ThreadsAreRunning) {
         m_exitSignal = new std::promise<void>();
@@ -196,6 +237,11 @@ void CWeatherLink::setTempTxId(int nTxId)
     if(!m_bIsConnected)
         return;
 
+#ifdef PLUGIN_DEBUG
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [setTempTxId]setting txid to : " << nTxId << std::endl;
+    m_sLogFile.flush();
+#endif
+
     const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
     getData();
 }
@@ -210,6 +256,11 @@ void CWeatherLink::setWindTxId(int nTxId)
     m_nTxIdWind = nTxId;
     if(!m_bIsConnected)
         return;
+
+#ifdef PLUGIN_DEBUG
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [setTempTxId] setting txid to : " << nTxId << std::endl;
+    m_sLogFile.flush();
+#endif
 
     const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
     getData();
@@ -226,6 +277,11 @@ void CWeatherLink::setRainTxId(int nTxId)
     if(!m_bIsConnected)
         return;
 
+#ifdef PLUGIN_DEBUG
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [setRainTxId] setting txid to : " << nTxId << std::endl;
+    m_sLogFile.flush();
+#endif
+
     const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
     getData();
 }
@@ -241,6 +297,11 @@ void CWeatherLink::setHumTxId(int nTxId)
     if(!m_bIsConnected)
         return;
 
+#ifdef PLUGIN_DEBUG
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [setHumTxId] setting txid to : " << nTxId << std::endl;
+    m_sLogFile.flush();
+#endif
+
     const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
     getData();
 }
@@ -255,6 +316,11 @@ void CWeatherLink::setDewTxId(int nTxId)
     m_nTxIdDew = nTxId;
     if(!m_bIsConnected)
         return;
+
+#ifdef PLUGIN_DEBUG
+    m_sLogFile << "["<<getTimeStamp()<<"]"<< " [setHumTxId] setting txid to : " << nTxId << std::endl;
+    m_sLogFile.flush();
+#endif
 
     const std::lock_guard<std::mutex> lock(m_DevAccessMutex);
     getData();
@@ -535,6 +601,10 @@ int CWeatherLink::getTxIds()
     // do http GET request to PLC got get current Az or Ticks .. TBD
     nErr = doGET("/v1/current_conditions", response_string);
     if(nErr) {
+#if defined PLUGIN_DEBUG && PLUGIN_DEBUG >= 2
+        m_sLogFile << "["<<getTimeStamp()<<"]"<< " [getTxIds] Error : " << nErr << std::endl;
+        m_sLogFile.flush();
+#endif
         return ERR_CMDFAILED;
     }
 
